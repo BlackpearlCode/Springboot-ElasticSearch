@@ -1,0 +1,10 @@
+spring:
+  elasticsearch:
+    #用户名
+    username: kibana
+    #密码
+    password: 9V_rPAzSQtPPd8D-sRso
+    #连接地址
+    uris: 192.168.12.5,192.168.12.6,192.168.12.7
+    #端口
+    port: 9200
