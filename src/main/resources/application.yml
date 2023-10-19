@@ -1,9 +1,9 @@
 spring:
   elasticsearch:
     #用户名
-    username: kibana
+    username: elastic
     #密码
-    password: 9V_rPAzSQtPPd8D-sRso
+    password: eSSykilZT=wF2Tze0CQy
     #连接地址
     uris: 192.168.12.5,192.168.12.6,192.168.12.7
     #端口
