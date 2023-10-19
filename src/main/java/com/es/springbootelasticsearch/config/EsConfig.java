@@ -1,5 +1,6 @@
 package com.es.springbootelasticsearch.config;
 
+import co.elastic.clients.elasticsearch.ElasticsearchAsyncClient;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -43,11 +44,17 @@ public class EsConfig {
     private String password;
 
 
-
+    //同步客户端连接
     @Bean
-    public ElasticsearchClient clientByPasswd() throws Exception {
+    public ElasticsearchClient clientByPasswd()  {
         ElasticsearchTransport transport = getElasticsearchTransport(userName,password, toHttpHost());
         return new ElasticsearchClient(transport);
+    }
+
+    //异步客户端连接
+    public ElasticsearchAsyncClient asyncClientByPasswd(){
+        ElasticsearchTransport transport = getElasticsearchTransport(userName,password, toHttpHost());
+        return new ElasticsearchAsyncClient(transport);
     }
 
     private static SSLContext buildSSLContext() {
