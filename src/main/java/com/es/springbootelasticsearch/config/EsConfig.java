@@ -33,7 +33,7 @@ import java.security.cert.CertificateFactory;
 public class EsConfig {
 
 
-    Logger logger=  LoggerFactory.getLogger(EsConfig.class);
+    static Logger logger=  LoggerFactory.getLogger(EsConfig.class);
     @Value("${spring.elasticsearch.uris}")
     private String hosts;
     @Value("${spring.elasticsearch.port}")
@@ -74,7 +74,7 @@ public class EsConfig {
             sslContext = sslContextBuilder.build();
         } catch (CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException |
                  KeyManagementException e) {
-            //log.error("ES连接认证失败", e);
+            logger.error("ES连接认证失败", e);
         }
 
         return sslContext;
