@@ -1,6 +1,8 @@
 package com.es.springbootelasticsearch.service.serviceImpl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.es.springbootelasticsearch.dto.User;
@@ -52,5 +54,23 @@ public class DocumentServiceImpl implements IDocuemtService {
                 .build();
         client.delete(deleteRequest);
         logger.info("数据删除成功");
+    }
+
+    @Override
+    public SearchResponse<Object> queryDocument(String content,String condition) throws IOException {
+        MatchQuery matchQuery = new MatchQuery.Builder()
+                //匹配内容
+                .field(content)
+                //条件
+                .query(condition)
+                .build();
+        Query query = new Query.Builder()
+                .match(matchQuery)
+                .build();
+        SearchRequest searchRequest = new SearchRequest.Builder()
+                .query(query)
+                .build();
+         return client.search(searchRequest, Object.class);
+
     }
 }

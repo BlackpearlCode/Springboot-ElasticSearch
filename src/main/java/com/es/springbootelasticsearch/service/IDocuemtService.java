@@ -1,5 +1,6 @@
 package com.es.springbootelasticsearch.service;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 
 import java.io.IOException;
@@ -33,6 +34,16 @@ public interface IDocuemtService {
      * @throws IOException
      */
     void deleteByName(String indexName,String id) throws IOException;
+
+
+    /**
+     * 根据筛选内容和条件筛选文档型数据
+     * @param content：内容
+     * @param condition：条件
+     * @return
+     * @throws IOException
+     */
+    SearchResponse<Object> queryDocument(String content,String condition) throws IOException;
 
 
 }

@@ -1,5 +1,6 @@
 package com.es.springbootelasticsearch.controller;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import com.es.springbootelasticsearch.dto.User;
 import com.es.springbootelasticsearch.service.serviceImpl.DocumentServiceImpl;
@@ -58,5 +59,17 @@ public class DocumentTestController {
     @RequestMapping("/deleteIndexByNameAndId")
     public void deleteIndexByNameAndId(@Param("indexName")String indexName,@Param("id")String id) throws IOException {
         documentService.deleteByName(indexName,id);
+    }
+
+    /**
+     * 通过内容和条件查询文档型数据
+     * @param content：内容
+     * @param condition：条件
+     * @throws IOException
+     */
+    @RequestMapping("/queryDocument")
+    public void queryDocument(@Param("content")String content,@Param("condition") String condition) throws IOException {
+        SearchResponse<Object> objectSearchResponse = documentService.queryDocument(content, condition);
+        System.out.println(objectSearchResponse.toString());
     }
 }
