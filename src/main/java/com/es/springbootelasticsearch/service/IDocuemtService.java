@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface IDocuemtService {
 
@@ -45,5 +46,48 @@ public interface IDocuemtService {
      */
     SearchResponse<Object> queryDocument(String content,String condition) throws IOException;
 
+    /**
+     * 判断文档是否存在
+     * @param indexName：索引名称
+     * @param id：文档id
+     * @return
+     * @throws IOException
+     */
+    boolean documentIsExit(String indexName,String id) throws IOException;
 
+    /**
+     * 修改指定文档
+     * @param indexName：索引名称
+     * @param id：文档id
+     * @param obj：修改内容
+     * @throws IOException
+     */
+    boolean updateDocument(String indexName, String id, Object obj) throws IOException;
+
+    /**
+     * 获取文档信息
+     * @param indexName：索引名称
+     * @param id：文档id
+     * @return
+     * @throws IOException
+     */
+    Object getDocument(String indexName,String id) throws IOException;
+
+
+    /**
+     * 批量删除指定索引下的文档
+     * @param indexName：索引名称
+     * @param ids：文档id集合
+     * @return
+     * @throws IOException
+     */
+    Boolean batchDeletDocument(String indexName,List<String> ids) throws IOException;
+
+    /**
+     * 查询指定索引下的所有数据信息
+     * @param indexName：索引名称
+     * @return
+     * @throws IOException
+     */
+    List<Object> queryAllDocument(String indexName) throws IOException;
 }

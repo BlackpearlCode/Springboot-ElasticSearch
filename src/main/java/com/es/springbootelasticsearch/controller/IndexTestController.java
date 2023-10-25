@@ -2,6 +2,7 @@ package com.es.springbootelasticsearch.controller;
 
 
 
+import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
 import com.es.springbootelasticsearch.service.serviceImpl.IndexServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class IndexTestController {
@@ -56,7 +58,7 @@ public class IndexTestController {
     }
 
     /**
-     * 更加名称删除索引
+     * 根据名称删除索引
      * @param indexName：索引名称
      * @throws IOException
      */
@@ -64,6 +66,16 @@ public class IndexTestController {
     public void delIndexByName(@Param("indexName")String indexName) throws IOException{
         Boolean bool = esService.deleteIndexByName(indexName);
         System.out.println(bool);
+    }
+
+    /**
+     * 查询所有索引
+     * @throws IOException
+     */
+    @RequestMapping("/queryAllIndex")
+    public String queryAllIndex() throws IOException {
+        String indicesRecords = esService.queryAllIndex();
+        return indicesRecords;
     }
 
 }

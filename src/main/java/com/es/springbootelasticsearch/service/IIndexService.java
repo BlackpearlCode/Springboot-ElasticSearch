@@ -1,6 +1,9 @@
 package com.es.springbootelasticsearch.service;
 
+import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
+
 import java.io.IOException;
+import java.util.List;
 
 public interface IIndexService {
     /**
@@ -11,13 +14,13 @@ public interface IIndexService {
     Boolean indexIsExists(String indexName) throws IOException;
 
     /**
-     * 方法：查询索引
+     * 方法：创建索引
      * @param indexName：索引名称
      */
     Boolean createIndex (String indexName) throws IOException;
 
     /**
-     * 根据名称查询索引信息
+     * 查询索引信息
      * @param indexName：索引名称
      * @return
      * @throws IOException
@@ -32,4 +35,11 @@ public interface IIndexService {
      * @throws IOException
      */
     Boolean deleteIndexByName(String indexName) throws IOException;
+
+    /**
+     * 查询所有的索引信息
+     * @return
+     * @throws IOException
+     */
+    String queryAllIndex() throws IOException;
 }

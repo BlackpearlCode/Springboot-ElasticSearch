@@ -1,6 +1,8 @@
 package com.es.springbootelasticsearch.service.serviceImpl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.cat.IndicesResponse;
+import co.elastic.clients.elasticsearch.cat.indices.IndicesRecord;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.es.springbootelasticsearch.service.IIndexService;
 import org.slf4j.Logger;
@@ -9,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 
@@ -58,5 +62,11 @@ public class IndexServiceImpl implements IIndexService {
         DeleteIndexResponse delete = client.indices().delete(deleteIndexRequest);
         logger.info(indexName+": 索引删除成功");
         return delete.acknowledged();
+    }
+
+    @Override
+    public String queryAllIndex() throws IOException {
+        IndicesResponse indices = client.cat().indices();
+        return indices.toString();
     }
 }
