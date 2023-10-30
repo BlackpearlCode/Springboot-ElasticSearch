@@ -1,6 +1,5 @@
 package com.es.springbootelasticsearch.service;
 
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 
 import java.io.IOException;
@@ -103,4 +102,15 @@ public interface IDocuemtService {
      * @throws IOException
      */
     List<Object> templatedSearch(String indexName,String field,String value) throws IOException;
+
+    /**
+     * 模糊查询
+     * @param indexName：索引名称
+     * @param fileName：字段名称
+     * @param fileValue：字段值
+     * @param fuzziness：fuzziness代表可以与关键词有误差的字数，可选值为0、1、2这三项
+     * @return
+     * @throws IOException
+     */
+    List<Object> fuzzyQuerySearch(String indexName,String fileName,String fileValue,String fuzziness) throws IOException;
 }

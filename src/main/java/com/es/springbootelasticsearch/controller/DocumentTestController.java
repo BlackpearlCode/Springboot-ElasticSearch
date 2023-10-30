@@ -144,4 +144,19 @@ public class DocumentTestController {
         List<Object> objects = documentService.templatedSearch((String) param.get("indexName"), (String) param.get("field"), (String) param.get("value"));
         System.out.println(objects.toString());
     }
+
+    /**
+     * 模糊查询
+     * @param indexName：索引名称
+     * @param fileName：字段名称
+     * @param fileValue：字段值
+     * @param fuzziness：fuzziness代表可以与关键词有误差的字数，可选值为0、1、2这三项
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping("/fuzzyQuerySearch")
+    public String fuzzyQuerySearch(@Param("indexName") String indexName,@Param("fileName") String fileName,@Param("fileValue") String fileValue,@Param("fuzziness") String fuzziness) throws IOException {
+        List<Object> objects = documentService.fuzzyQuerySearch(indexName, fileName, fileValue, fuzziness);
+        return objects.toString();
+    }
 }

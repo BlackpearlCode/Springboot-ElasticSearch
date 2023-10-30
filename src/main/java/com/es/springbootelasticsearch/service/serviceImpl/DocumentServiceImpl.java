@@ -197,6 +197,33 @@ public class DocumentServiceImpl implements IDocuemtService {
         return list;
     }
 
+    @Override
+    public List<Object> fuzzyQuerySearch(String indexName, String fileName, String fileValue,String fuzziness) throws IOException {
+        SearchResponse<Object> response = client.search(s -> s
+                        .index(indexName)
+                        .query(q -> q
+                                // 模糊查询
+                                .fuzzy(f -> f
+                                        // 需要判断的字段名称
+                                        .field(fileName)
+                                        // 需要模糊查询的关键词
+                                        // 目前文档中没有liuyi这个用户名
+                                        .value(fileValue)
+                                        // fuzziness代表可以与关键词有误差的字数，可选值为0、1、2这三项
+                                        .fuzziness(fuzziness)
+                                )
+                        ),
+                Object.class
+        );
+        List<Hit<Object>> hits = response.hits().hits();
+        List<Object> objects=new LinkedList<>();
+        for (Hit<?> hit:hits) {
+            objects.add(hit.source());
+        }
+        return objects;
+    }
+
+    //将筛选条件转换成Query类型的集合
     private List<Query> initMatchQuery(Map<String,String> param){
        if(param.isEmpty()){
            return null;
