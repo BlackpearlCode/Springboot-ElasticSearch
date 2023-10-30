@@ -1,21 +1,23 @@
 package com.es.springbootelasticsearch.service.serviceImpl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
 import com.es.springbootelasticsearch.service.IDocuemtService;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -23,7 +25,10 @@ public class DocumentServiceImpl implements IDocuemtService {
 
     Logger logger=  LoggerFactory.getLogger(DocumentServiceImpl.class);
     @Autowired
-    private ElasticsearchClient client;
+    private  ElasticsearchClient client;
+
+    private static  int size=5;
+    private static  int pageNum=0;
     @Override
     public void createDocument(String indexName,String indexId,Object obj) throws IOException {
 
@@ -60,20 +65,39 @@ public class DocumentServiceImpl implements IDocuemtService {
     }
 
     @Override
-    public SearchResponse<Object> queryDocument(String content,String condition) throws IOException {
-        MatchQuery matchQuery = new MatchQuery.Builder()
-                //匹配内容
-                .field(content)
-                //条件
-                .query(condition)
-                .build();
-        Query query = new Query.Builder()
-                .match(matchQuery)
-                .build();
-        SearchRequest searchRequest = new SearchRequest.Builder()
-                .query(query)
-                .build();
-         return client.search(searchRequest, Object.class);
+    public List<Object> queryDocument(Map<String,String> param,String indexName,String sortField,int isDesc,int offset,int pageSize ) throws IOException {
+        if(pageSize !=0){
+            size= pageSize;
+        }
+        if(offset !=0){
+            pageNum=offset*size;
+        }
+        SortOrder sort;
+        //判断是否为0；0：降序；1：升序
+        boolean bool = isDesc == 0 ? true : false;
+        if(bool){
+            sort = SortOrder.Desc;
+        }else{
+            sort=SortOrder.Asc;
+        }
+        List<Query> queries = initMatchQuery(param);
+        SearchResponse<?> searchResponse = client.search(s -> s
+                .index(indexName)
+                .query(q -> q
+                        .bool(b -> b.must(queries))
+                )
+                .from(pageNum)
+                .size(size)
+                        .sort(f -> f.field(o -> o.field(sortField)
+                                .order(sort))),
+                Object.class);
+        List<? extends Hit<?>> hitList = searchResponse.hits().hits();
+        List<Object> objectList=new LinkedList<>();
+        for(Hit<?> hit:hitList){
+            Object source = hit.source();
+            objectList.add(source);
+        }
+        return objectList;
 
     }
 
@@ -135,10 +159,61 @@ public class DocumentServiceImpl implements IDocuemtService {
 
     @Override
     public List<Object> queryAllDocument(String indexName) throws IOException {
-        SearchResponse<Object> searchResponse = client.search(builder -> builder.index(indexName), Object.class);
+        SearchResponse<Object> searchResponse = client.search(builder -> builder
+                        .index(indexName),
+                        Object.class);
         List<Hit<Object>> hits = searchResponse.hits().hits();
         List<Object> list=new LinkedList<>();
         hits.forEach(x->list.add(x));
         return list;
     }
+
+    @Override
+    public List<Object> templatedSearch(String indexName,String field,String value) throws IOException {
+        //创建模板
+        client.putScript(r -> r
+                //模板标识符
+                .id("query-script")
+                .script(s -> s
+                        .lang("mustache")
+                        .source("{\"query\":{\"match\":{\"{{field}}\":\"{{value}}\"}}}")));
+        //开始用模板查询
+        SearchTemplateResponse<?> response = client.searchTemplate(r -> r
+                        //索引名称
+                        .index(indexName)
+                        //模板标识符
+                        .id("query-script")
+                        //模板参数值
+                        .params("field", JsonData.of(field))
+                        .params("value", JsonData.of(value)),
+                Object.class);
+        List<? extends Hit<?>> hits = response.hits().hits();
+        List<Object> list = new ArrayList<>();
+        for(Hit<?> obj:hits){
+            Object source = obj.source();
+            assert source !=null;
+            list.add(source);
+        }
+        return list;
+    }
+
+    private List<Query> initMatchQuery(Map<String,String> param){
+       if(param.isEmpty()){
+           return null;
+       }
+       List<Query> queries=new LinkedList<>();
+        for (Map.Entry<String, String> s : param.entrySet()) {
+            Query query = MatchQuery.of(m -> m
+                    .field(s.getKey())
+                    .query(s.getValue())
+
+            )._toQuery();
+            queries.add(query);
+        }
+        logger.info(queries.toString());
+        return queries;
+    }
+
+
+
 }

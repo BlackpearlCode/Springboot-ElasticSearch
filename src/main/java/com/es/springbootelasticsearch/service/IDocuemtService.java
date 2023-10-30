@@ -38,13 +38,17 @@ public interface IDocuemtService {
 
 
     /**
-     * 根据筛选内容和条件筛选文档型数据
-     * @param content：内容
-     * @param condition：条件
+     * 多条件查询
+     * @param param：筛选条件；key为筛选字段；value:字段对应的属性值
+     * @param indexName：索引名称
+     * @param sortField：排序字段
+     * @param isDesc：是否降序；0：降序；1:升序
+     * @param offset：起始页
+     * @param pageSize：每页条数
      * @return
      * @throws IOException
      */
-    SearchResponse<Object> queryDocument(String content,String condition) throws IOException;
+    List<Object> queryDocument(Map<String,String> param,String indexName,String sortField,int isDesc,int offset,int pageSize ) throws IOException;
 
     /**
      * 判断文档是否存在
@@ -90,4 +94,13 @@ public interface IDocuemtService {
      * @throws IOException
      */
     List<Object> queryAllDocument(String indexName) throws IOException;
+
+
+    /**
+     * 模板搜索
+     * @param param
+     * @return
+     * @throws IOException
+     */
+    List<Object> templatedSearch(String indexName,String field,String value) throws IOException;
 }

@@ -59,15 +59,20 @@ public class DocumentTestController {
     }
 
     /**
-     * 通过内容和条件查询文档型数据
-     * @param content：内容
-     * @param condition：条件
+     * 多条件查询
+     * @param param：筛选条件；key为筛选字段；value:字段对应的属性值
+     * @param indexName：索引名称
+     * @param sortField：排序字段
+     * @param isDesc：是否降序；0：降序；1:升序
+     * @param offset：起始页
+     * @param pageSize：每页条数
+     * @return
      * @throws IOException
      */
     @RequestMapping("/queryDocument")
-    public void queryDocument(@Param("content")String content,@Param("condition") String condition) throws IOException {
-        SearchResponse<Object> objectSearchResponse = documentService.queryDocument(content, condition);
-        System.out.println(objectSearchResponse.toString());
+    public String queryDocument(@RequestBody Map<String,String> param,@Param("indexName") String indexName,@Param("sortField") String sortField,@Param("isDesc") int isDesc,@Param("offset") int offset,@Param("pageSize") int pageSize) throws IOException {
+        List<Object> objects = documentService.queryDocument( param, indexName, sortField, isDesc, offset, pageSize);
+        return objects.toString();
     }
 
     /**
@@ -126,6 +131,17 @@ public class DocumentTestController {
     @RequestMapping("/queryAllDocument")
     public void queryAllDocument(@Param("indexName")String indexName) throws IOException {
         List<Object> objects = documentService.queryAllDocument(indexName);
+        System.out.println(objects.toString());
+    }
+
+    /**
+     * 模板搜索
+     * @param param
+     * @throws IOException
+     */
+    @RequestMapping("/templatedSearch")
+    public void templatedSearch(@RequestBody Map<String,Object> param) throws IOException {
+        List<Object> objects = documentService.templatedSearch((String) param.get("indexName"), (String) param.get("field"), (String) param.get("value"));
         System.out.println(objects.toString());
     }
 }
